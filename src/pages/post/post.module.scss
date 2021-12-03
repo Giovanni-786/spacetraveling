@@ -1,0 +1,63 @@
+.container_banner{    
+    max-width: 100vw;
+    text-align: center;
+    align-items: center;
+    margin: 3em auto;
+
+    .banner{
+        img{
+           width: 100%;
+           height: auto;
+        }
+    }
+
+}
+
+.container_title{
+    text-align: center;
+    align-items: center;
+    margin: 3em 1.5em;
+
+    .info{
+        margin-top: 10px;
+    }
+}
+
+
+.container_content{
+    text-align: center;
+    align-items: center;
+    max-width: 530px;
+    margin: 0 auto;
+    .content{
+        
+        h2{
+            display: block;
+            text-align: left;
+            margin-bottom: 2em;
+            margin-top: 2em;
+        }
+    }
+
+}
+
+.container_body_text{
+    margin: 10px;
+    
+    p{
+        padding: 3px;
+    }
+
+}
+
+
+.info {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    p{
+        font-size: 18px;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+}
