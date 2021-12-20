@@ -42,27 +42,33 @@ export default function Home({postsPagination}:HomeProps): JSX.Element {
   const [nextPage, setNextPage] = useState(postsPagination.next_page);
   const [posts, setPosts] = useState<Post[]>(postsPagination.results);
 
-  async function handleMorePostsButtonClick(): Promise<void> {
-    const result = await fetch(nextPage);
-    const prismicResult = await result.json();
-    const newPosts = {
-      ...prismicResult,
-      first_publication_date: format(new Date(prismicResult.first_publication_date), "dd MMM yyyy", {
-        locale: ptBR
-      })
 
-    }
-
-    setNextPage(prismicResult.next_page);
-    setPosts([...posts, ...newPosts]);
+  function handlePagination(): void {
+    fetch(nextPage)
+      .then(res => res.json())
+      .then(data => {
+        const formattedData = data.results.map(post => {
+          return {
+            uid: post.uid,
+            first_publication_date: format(new Date(post.first_publication_date), "dd MMM yyyy", {
+              locale: ptBR
+            }),
+            data: {
+              title: post.data.title,
+              subtitle: post.data.subtitle,
+              author: post.data.author,
+            },
+          };
+        });
+        setPosts([...posts, ...formattedData]);
+        setNextPage(data.next_page);
+      });
   }
-
-
 
   return (
       <>   
         <main className={styles.container}>
-            {posts.map(post =>(    
+          {posts.map(post =>(    
           <div className={styles.posts}>   
              <Link href={`/post/${post.uid}`}>
               <a key={post.uid}>{post.data.title}</a>
@@ -78,7 +84,7 @@ export default function Home({postsPagination}:HomeProps): JSX.Element {
           <button
             className={styles.morePostsButton}
             type="button"
-            onClick={handleMorePostsButtonClick}
+            onClick={handlePagination}
           >
             <a>Carregar mais posts</a>
           </button>
@@ -95,15 +101,13 @@ export const getStaticProps: GetStaticProps = async () =>{
     Prismic.predicates.at('document.type', 'posts')
   ], {
     fetch: ['posts.title', 'posts.subtitle', 'posts.author'],
-    pageSize: 2,
+    pageSize: 1,
     orderings: '[document.first_publication_date desc]',
   });
-
-  // console.log(JSON.stringify(postsResponse, null, 2));
   
+
   const posts = postsResponse.results.map(post => {
     return {
-      id: post.id,
        uid: post.uid,
         first_publication_date: format(new Date(post.first_publication_date), "dd MMM yyyy", {
           locale: ptBR
@@ -119,17 +123,9 @@ export const getStaticProps: GetStaticProps = async () =>{
 
 
 
-const nextPost = await prismic.query(
-  [Prismic.Predicates.at('document.type', 'posts')],
-  {
-    pageSize: 1,
-    after: `${posts[0].id}`,
-    orderings: '[document.first_publication_date]',
-  }
-);
 
   const postsPagination = {
-    next_page: nextPost.next_page,
+    next_page: postsResponse.next_page,
     results: posts
   }
 
